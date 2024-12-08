@@ -22,8 +22,8 @@ public class Product implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@Column(name = "product", nullable = false)
-	private String product;
+	@Column(name = "name", nullable = false)
+	private String name;
 	@Column(name = "description", nullable = false)
 	private String description;
 	private Integer quantity;
@@ -36,9 +36,9 @@ public class Product implements Serializable{
 	public Product() {
 	}
 	
-	public Product(Long id, String product, String description, Integer quantity, Date entryDate, Department department) {
+	public Product(Long id, String name, String description, Integer quantity, Date entryDate, Department department) {
 		this.id = id;
-		this.product = product;
+		this.name = name;
 		this.description = description;
 		this.quantity = quantity;
 		this.entryDate = entryDate;
@@ -53,12 +53,12 @@ public class Product implements Serializable{
 		this.id = id;
 	}
 
-	public String getProduct() {
-		return product;
+	public String getName() {
+		return name;
 	}
 
-	public void setProduct(String product) {
-		this.product = product;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getDescription() {
@@ -89,13 +89,19 @@ public class Product implements Serializable{
 		return department;
 	}
 
-	public void setDepartment(Department sector) {
-		this.department = sector;
+	public void setDepartment(Department department) {
+		if (this.department != null) {
+	        this.department.getProducts().remove(this);
+	    }
+	    this.department = department;
+	    if (department != null) {
+	        department.getProducts().add(this);
+	    }
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(department, description, entryDate, id, product, quantity);
+		return Objects.hash(department, description, entryDate, id, name, quantity);
 	}
 
 	@Override
@@ -109,8 +115,10 @@ public class Product implements Serializable{
 		Product other = (Product) obj;
 		return Objects.equals(department, other.department) && Objects.equals(description, other.description)
 				&& Objects.equals(entryDate, other.entryDate) && Objects.equals(id, other.id)
-				&& Objects.equals(product, other.product) && Objects.equals(quantity, other.quantity);
+				&& Objects.equals(name, other.name) && Objects.equals(quantity, other.quantity);
 	}
-
+	
+	
+	
 	
 }
