@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,8 +32,9 @@ public class Product implements Serializable{
 	private Date entryDate;
 	
 	@ManyToOne
-    @JoinColumn(name = "department_id", nullable = false)
-    private Department department;
+	@JoinColumn(name = "department_id", nullable = false)
+	@JsonBackReference
+	private Department department;
 	
 	public Product() {
 	}

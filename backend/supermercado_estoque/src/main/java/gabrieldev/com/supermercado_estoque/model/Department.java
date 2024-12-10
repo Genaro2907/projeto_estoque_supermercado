@@ -1,8 +1,11 @@
 package gabrieldev.com.supermercado_estoque.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -23,14 +26,17 @@ public class Department implements Serializable{
 	private String sector;
 	
 	@OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Product> products;
+	@JsonManagedReference
+	private List<Product> products;
 	
 	public Department() {
+		this.products = new ArrayList<>();
 	}
 	
 	public Department(Long id, String sector) {
 		this.id = id;
 		this.sector = sector;
+		
 	}
 
 	public Long getId() {
@@ -58,6 +64,9 @@ public class Department implements Serializable{
     }
     
     public void addProduct(Product product) {
+        if (this.products == null) {
+            this.products = new ArrayList<>();
+        }
         products.add(product);
         product.setDepartment(this);
     }

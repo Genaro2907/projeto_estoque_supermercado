@@ -28,5 +28,15 @@ public class DepartmentService {
 	    }
 	    return repository.save(department);
 	}
+	public Department update(Long id, Department department) {
+		Department existingDepartment = findById(id);
+	    existingDepartment.setSector(department.getSector());
+	    return repository.save(existingDepartment);
+	}
+	
+	public void delete(Long id) {
+	    Department department = findById(id);
+	    repository.delete(department);
+	}
 	
 }
