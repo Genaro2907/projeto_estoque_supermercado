@@ -1,59 +1,99 @@
 package gabrieldev.com.supermercado_estoque.services;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import gabrieldev.com.supermercado_estoque.controllers.exceptions.ResourceNotFoundException;
 import gabrieldev.com.supermercado_estoque.model.Department;
 import gabrieldev.com.supermercado_estoque.model.Product;
+import gabrieldev.com.supermercado_estoque.model.DTO.ProductDTO;
 import gabrieldev.com.supermercado_estoque.repository.DepartmentRepository;
 import gabrieldev.com.supermercado_estoque.repository.ProductRepository;
 
 @Service
 public class ProductService {
-	
-	 @Autowired
-	 private ProductRepository productRepository;
-	
-	@Autowired
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
     private DepartmentRepository departmentRepository;
-	
-	public Product findById(Long id) {
-		return productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found with ID: " + id));
-	}
-	public List<Product> findAll() {
-		return productRepository.findAll();
-	}
-	public Product create(Product product) {
-        if (product.getDepartment() == null || product.getDepartment().getId() == null) {
-            throw new RuntimeException("Department ID is required to create a product!");
-        }
 
-        Department department = departmentRepository.findById(product.getDepartment().getId())
-                .orElseThrow(() -> new RuntimeException("Department not found with ID: " + product.getDepartment().getId()));
+    
 
+    public ProductDTO findById(Long id) {
+        return productRepository.findById(id)
+            .map(this::convertToDTO)
+            .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado com ID: " + id));
+    }
+
+    public List<ProductDTO> findAll() {
+        return productRepository.findAll().stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
+    }
+
+    public ProductDTO create(ProductDTO productDTO) {
+        Department department = departmentRepository.findById(productDTO.getDepartmentID())
+            .orElseThrow(() -> new ResourceNotFoundException("Departamento não encontrado"));
+
+        Product product = new Product();
+        product.setName(productDTO.getName());
+        product.setDescription(productDTO.getDescription());
+        product.setQuantity(productDTO.getQuantity());
+        product.setEntryDate(productDTO.getEntryDate());
         product.setDepartment(department);
 
-        return productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
+        return convertToDTO(savedProduct);
     }
-	public Product update(Long id, Product updatedProduct) {
-	    Product existingProduct = findById(id);
-	    existingProduct.setName(updatedProduct.getName());
-	    existingProduct.setDescription(updatedProduct.getDescription());
-	    existingProduct.setQuantity(updatedProduct.getQuantity());
-	    existingProduct.setEntryDate(updatedProduct.getEntryDate());
-	    existingProduct.setDepartment(updatedProduct.getDepartment());
-	    return productRepository.save(existingProduct);
-	}
-	
-	public void delete(Long id) {
-	    Product product = findById(id);
-	    productRepository.delete(product);
-	}
-	public List<Product> findByDepartment(Long departmentId) {
-	    return productRepository.findByDepartmentId(departmentId);
-	
-}
-		
+
+    public ProductDTO update(Long id, ProductDTO productDTO) {
+        Product existingProduct = productRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado com ID: " + id));
+
+        Department department = departmentRepository.findById(productDTO.getDepartmentID())
+            .orElseThrow(() -> new ResourceNotFoundException("Departamento não encontrado"));
+
+        existingProduct.setName(productDTO.getName());
+        existingProduct.setDescription(productDTO.getDescription());
+        existingProduct.setQuantity(productDTO.getQuantity());
+        existingProduct.setEntryDate(productDTO.getEntryDate());
+        existingProduct.setDepartment(department);
+
+        Product updatedProduct = productRepository.save(existingProduct);
+        return convertToDTO(updatedProduct);
+    }
+
+    public void delete(Long id) {
+        Product product = productRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado com ID: " + id));
+        productRepository.delete(product);
+    }
+
+    public List<ProductDTO> findByDepartment(Long departmentId) {
+        List<Product> products = productRepository.findByDepartmentId(departmentId);
+        return products.stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
+    }
+    
+    private ProductDTO convertToDTO(Product product) {
+        return new ProductDTO(
+            product.getId(),
+            product.getName(),
+            product.getDescription(),
+            product.getQuantity(),
+            product.getEntryDate(),
+            product.getDepartment().getId()
+        );
+    }
+    
+    
+    
+    
+    
 }
