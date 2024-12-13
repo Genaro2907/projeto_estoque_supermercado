@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import gabrieldev.com.supermercado_estoque.model.DTO.DepartmentDTO;
+import gabrieldev.com.supermercado_estoque.model.DTO.SimpleDepartmentDTO;
 import gabrieldev.com.supermercado_estoque.services.DepartmentService;
 
 @RestController
@@ -54,4 +55,10 @@ public class DepartmentController {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("/sector")
+    public ResponseEntity<List<SimpleDepartmentDTO>> findDepartmentsWithoutProducts() {
+        List<SimpleDepartmentDTO> departments = service.findDepartmentsWithoutProducts();
+        return ResponseEntity.ok(departments);
+    }
+    
 }
