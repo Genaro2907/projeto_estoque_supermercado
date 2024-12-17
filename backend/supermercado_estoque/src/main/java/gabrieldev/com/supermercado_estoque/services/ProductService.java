@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import gabrieldev.com.supermercado_estoque.controllers.exceptions.ResourceNotFoundException;
 import gabrieldev.com.supermercado_estoque.model.Department;
 import gabrieldev.com.supermercado_estoque.model.Product;
+import gabrieldev.com.supermercado_estoque.model.DTO.DepartmentDTO;
 import gabrieldev.com.supermercado_estoque.model.DTO.ProductDTO;
 import gabrieldev.com.supermercado_estoque.repository.DepartmentRepository;
 import gabrieldev.com.supermercado_estoque.repository.ProductRepository;
@@ -21,8 +22,6 @@ public class ProductService {
 
     @Autowired
     private DepartmentRepository departmentRepository;
-
-    
 
     public ProductDTO findById(Long id) {
         return productRepository.findById(id)
@@ -37,7 +36,7 @@ public class ProductService {
     }
 
     public ProductDTO create(ProductDTO productDTO) {
-        Department department = departmentRepository.findById(productDTO.getDepartmentID())
+        Department department = departmentRepository.findById(productDTO.getDepartmentID().getId())
             .orElseThrow(() -> new ResourceNotFoundException("Departamento não encontrado"));
 
         Product product = new Product();
@@ -55,7 +54,7 @@ public class ProductService {
         Product existingProduct = productRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado com ID: " + id));
 
-        Department department = departmentRepository.findById(productDTO.getDepartmentID())
+        Department department = departmentRepository.findById(productDTO.getDepartmentID().getId())
             .orElseThrow(() -> new ResourceNotFoundException("Departamento não encontrado"));
 
         existingProduct.setName(productDTO.getName());
@@ -80,20 +79,23 @@ public class ProductService {
             .map(this::convertToDTO)
             .collect(Collectors.toList());
     }
-    
+
     private ProductDTO convertToDTO(Product product) {
-        return new ProductDTO(
-            product.getId(),
-            product.getName(),
-            product.getDescription(),
-            product.getQuantity(),
-            product.getEntryDate(),
-            product.getDepartment().getId()
-        );
+        ProductDTO productDTO = new ProductDTO();
+
+        productDTO.setId(product.getId());
+        productDTO.setName(product.getName());
+        productDTO.setDescription(product.getDescription());
+        productDTO.setQuantity(product.getQuantity());
+        productDTO.setEntryDate(product.getEntryDate());
+
+        if (product.getDepartment() != null) {
+            DepartmentDTO departmentDTO = new DepartmentDTO();
+            departmentDTO.setId(product.getDepartment().getId());
+            departmentDTO.setSector(product.getDepartment().getSector());
+            productDTO.setDepartmentID(departmentDTO);
+        }
+
+        return productDTO;
     }
-    
-    
-    
-    
-    
 }

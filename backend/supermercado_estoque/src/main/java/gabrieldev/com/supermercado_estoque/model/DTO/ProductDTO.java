@@ -11,14 +11,14 @@ public class ProductDTO implements Serializable{
 	private String description;
 	private Integer quantity;
 	private Date entryDate;
-	private Long departmentID;
+	private DepartmentDTO departmentID;
 	
 	
 	public ProductDTO() {
 		
 	}
 
-	public ProductDTO(Long id, String name, String description, Integer quantity, Date entryDate, Long departmentID) {
+	public ProductDTO(Long id, String name, String description, Integer quantity, Date entryDate, DepartmentDTO departmentID) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -78,12 +78,12 @@ public class ProductDTO implements Serializable{
 	}
 
 
-	public Long getDepartmentID() {
+	public DepartmentDTO getDepartmentID() {
 		return departmentID;
 	}
 
 
-	public void setDepartmentID(Long departmentID) {
+	public void setDepartmentID(DepartmentDTO departmentID) {
 		this.departmentID = departmentID;
 	}
 	

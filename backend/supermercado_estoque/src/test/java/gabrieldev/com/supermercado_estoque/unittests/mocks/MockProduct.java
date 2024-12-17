@@ -5,6 +5,7 @@ import java.util.List;
 
 import gabrieldev.com.supermercado_estoque.model.Department;
 import gabrieldev.com.supermercado_estoque.model.Product;
+import gabrieldev.com.supermercado_estoque.model.DTO.DepartmentDTO;
 import gabrieldev.com.supermercado_estoque.model.DTO.ProductDTO;
 
 public class MockProduct {
@@ -36,28 +37,33 @@ public class MockProduct {
     public Product mockEntity(Integer number) {
         Product product = new Product();
         Department department = new Department();
+        
         department.setId(number.longValue()); 
         department.setSector("Sector Test" + number);
 
+        product.setId(number.longValue());
         product.setName("Name Test" + number);
         product.setDescription("Description Test" + number);
         product.setQuantity(number);
-        product.setId(number.longValue());
         product.setDepartment(department); 
+        
         return product;
     }
 
+    
     public ProductDTO mockDTO(Integer number) {
-        ProductDTO product = new ProductDTO();
-        product.setName("Name Test" + number);
-        product.setDescription("Description Test" + number);
-        product.setQuantity(number);
-        product.setId(number.longValue());
-        if (number == 0) {
-            product.setDepartmentID(0L);
-        } else {
-            product.setDepartmentID(number.longValue());
-        }
-        return product;
+        ProductDTO productDTO = new ProductDTO();
+        DepartmentDTO departmentDTO = new DepartmentDTO();
+        
+        departmentDTO.setId(number.longValue());
+        departmentDTO.setSector("Sector Test" + number);
+        
+        productDTO.setId(number.longValue());
+        productDTO.setName("Name Test" + number);
+        productDTO.setDescription("Description Test" + number);
+        productDTO.setQuantity(number);
+        productDTO.setDepartmentID(departmentDTO);
+        
+        return productDTO;
     }
 }

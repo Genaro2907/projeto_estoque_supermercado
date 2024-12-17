@@ -98,16 +98,30 @@ public class DepartmentService {
 	}
 
 	private DepartmentDTO convertToDTO(Department department) {
-		DepartmentDTO dto = new DepartmentDTO(department.getId(), department.getSector());
+	    DepartmentDTO dto = new DepartmentDTO(department.getId(), department.getSector());
 
-		if (department.getProducts() != null) {
-			List<ProductDTO> productDTOs = department.getProducts().stream()
-					.map(product -> new ProductDTO(product.getId(), product.getName(), product.getDescription(),
-							product.getQuantity(), product.getEntryDate(), product.getDepartment().getId()))
-					.collect(Collectors.toList());
-			dto.setProducts(productDTOs);
-		}
+	    if (department.getProducts() != null) {
+	        List<ProductDTO> productDTOs = department.getProducts().stream()
+	            .map(product -> {
+	                ProductDTO productDTO = new ProductDTO();
+	                productDTO.setId(product.getId());
+	                productDTO.setName(product.getName());
+	                productDTO.setDescription(product.getDescription());
+	                productDTO.setQuantity(product.getQuantity());
+	                productDTO.setEntryDate(product.getEntryDate());
 
-		return dto;
+	                DepartmentDTO productDepartmentDTO = new DepartmentDTO();
+	                productDepartmentDTO.setId(product.getDepartment().getId());
+	                productDepartmentDTO.setSector(product.getDepartment().getSector());
+
+	                productDTO.setDepartmentID(productDepartmentDTO);
+	                return productDTO;
+	            })
+	            .collect(Collectors.toList());
+	        dto.setProducts(productDTOs);
+	    }
+
+	    return dto;
 	}
+
 }

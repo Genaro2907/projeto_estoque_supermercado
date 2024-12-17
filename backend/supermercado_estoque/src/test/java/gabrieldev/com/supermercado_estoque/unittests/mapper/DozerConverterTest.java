@@ -31,8 +31,10 @@ public class DozerConverterTest {
         assertEquals("Name Test0", output.getName());
         assertEquals("Description Test0", output.getDescription());
         assertEquals(0, output.getQuantity());
-        assertEquals(0, output.getDepartmentID());
-    }
+        assertNotNull(output.getDepartmentID(), "DepartmentDTO não deveria ser nulo");
+        assertEquals(Long.valueOf(0L), output.getDepartmentID().getId(), "ID do departamento deve ser 0");
+        }
+        
 
     @Test
     public void parseEntityListToDTOListTest() {
@@ -43,7 +45,8 @@ public class DozerConverterTest {
         assertEquals("Name Test0", outputZero.getName());
         assertEquals("Description Test0", outputZero.getDescription());
         assertEquals(0, outputZero.getQuantity());
-        assertEquals(0, outputZero.getDepartmentID());
+        assertNotNull(outputZero.getDepartmentID(), "DepartmentDTO não deveria ser nulo");
+        assertEquals(Long.valueOf(0L), outputZero.getDepartmentID().getId(), "ID do departamento deve ser 0");
         
         ProductDTO outputDois = outputList.get(2);
         
@@ -51,7 +54,9 @@ public class DozerConverterTest {
         assertEquals("Name Test2", outputDois.getName());
         assertEquals("Description Test2", outputDois.getDescription());
         assertEquals(2, outputDois.getQuantity());
-        assertEquals(2, outputDois.getDepartmentID());
+        assertNotNull(outputDois.getDepartmentID(), "DepartmentDTO não deveria ser nulo");
+        assertEquals(Long.valueOf(2L), outputDois.getDepartmentID().getId(), "ID do departamento deve ser 2");
+        
         
         ProductDTO outputQuatro = outputList.get(4);
         
@@ -59,44 +64,47 @@ public class DozerConverterTest {
         assertEquals("Name Test4", outputQuatro.getName());
         assertEquals("Description Test4", outputQuatro.getDescription());
         assertEquals(4, outputQuatro.getQuantity());
-        assertEquals(4, outputQuatro.getDepartmentID());
+        assertNotNull(outputQuatro.getDepartmentID(), "DepartmentDTO não deveria ser nulo");
+        assertEquals(Long.valueOf(4L), outputQuatro.getDepartmentID().getId(), "ID do departamento deve ser 4");
     }
-
     @Test
     public void parseDTOToEntityTest() {
-        Product output = ModelMapper.parseObject(inputObject.mockDTO(), Product.class);
+        ProductDTO dto = inputObject.mockDTO(0);
+        Product output = ModelMapper.parseObject(dto, Product.class);
+
+        assertNotNull(output);
         assertEquals(Long.valueOf(0L), output.getId());
         assertEquals("Name Test0", output.getName());
-        assertEquals("Description Test0", output.getDescription());
-        assertNotNull(output.getDepartment());
         assertEquals(Long.valueOf(0L), output.getDepartment().getId());
     }
 
     @Test
     public void parserDTOListToEntityListTest() {
         List<Product> outputList = ModelMapper.parseListObjects(inputObject.mockDTOList(), Product.class);
+        
         Product outputZero = outputList.get(0);
         
         assertEquals(Long.valueOf(0L), outputZero.getId());
         assertEquals("Name Test0", outputZero.getName());
         assertEquals("Description Test0", outputZero.getDescription());
-        assertNotNull(outputZero.getDepartment());
+        assertEquals(0, outputZero.getQuantity());
         assertEquals(Long.valueOf(0L), outputZero.getDepartment().getId());
         
         Product outputDois = outputList.get(2);
-        
         assertEquals(Long.valueOf(2L), outputDois.getId());
         assertEquals("Name Test2", outputDois.getName());
         assertEquals("Description Test2", outputDois.getDescription());
-        assertNotNull(outputZero.getDepartment());
+        assertEquals(2, outputDois.getQuantity());
         assertEquals(Long.valueOf(0L), outputZero.getDepartment().getId());
         
         Product outputQuatro = outputList.get(4);
-        
         assertEquals(Long.valueOf(4L), outputQuatro.getId());
         assertEquals("Name Test4", outputQuatro.getName());
         assertEquals("Description Test4", outputQuatro.getDescription());
-        assertNotNull(outputZero.getDepartment());
-        assertEquals(Long.valueOf(0L), outputZero.getDepartment().getId());;
+        assertEquals(4, outputQuatro.getQuantity());
+        assertEquals(Long.valueOf(0L), outputZero.getDepartment().getId());
+
     }
+    
+    
 }

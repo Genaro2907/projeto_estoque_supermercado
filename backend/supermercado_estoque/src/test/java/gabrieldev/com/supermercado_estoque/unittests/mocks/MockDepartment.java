@@ -65,7 +65,7 @@ public class MockDepartment {
             productDTO.setId((long) i + number * 10);
             productDTO.setDescription("Description " + i);
             productDTO.setQuantity(i * 10);
-            productDTO.setDepartmentID(1L); 
+            productDTO.setDepartmentID(departmentDTO); 
             productDTOs.add(productDTO);
         }
 

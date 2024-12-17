@@ -14,7 +14,10 @@ public class DepartmentDTO implements Serializable {
 
     public DepartmentDTO() {
     }
-
+    
+    public DepartmentDTO(Long id) {
+        this.id = id;
+    }
     public DepartmentDTO(Long id, String sector) {
         this.id = id;
         this.sector = sector;
