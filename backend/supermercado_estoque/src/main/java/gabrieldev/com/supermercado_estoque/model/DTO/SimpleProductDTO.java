@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.github.dozermapper.core.Mapping;
 
 @JsonPropertyOrder({ "id", "name", "description", "quantity", "entryDate", "departmentID"})
-public class ProductDTO implements Serializable{
+public class SimpleProductDTO implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@JsonProperty("id")
@@ -19,21 +19,19 @@ public class ProductDTO implements Serializable{
 	private String description;
 	private Integer quantity;
 	private Date entryDate;
-	private DepartmentDTO departmentID;
 	
 	
-	public ProductDTO() {
+	public SimpleProductDTO() {
 		
 	}
 
-	public ProductDTO(Long key, String name, String description, Integer quantity, Date entryDate, DepartmentDTO departmentID) {
+	public SimpleProductDTO(Long key, String name, String description, Integer quantity, Date entryDate) {
 		super();
 		this.key = key;
 		this.name = name;
 		this.description = description;
 		this.quantity = quantity;
 		this.entryDate = entryDate;
-		this.departmentID = departmentID;
 	}
 
 	public Long getKey() {
@@ -83,19 +81,9 @@ public class ProductDTO implements Serializable{
 		this.entryDate = entryDate;
 	}
 
-
-	public DepartmentDTO getDepartmentID() {
-		return departmentID;
-	}
-
-
-	public void setDepartmentID(DepartmentDTO departmentID) {
-		this.departmentID = departmentID;
-	}
-
 	@Override
 	public int hashCode() {
-		return Objects.hash(departmentID, description, entryDate, key, name, quantity);
+		return Objects.hash(description, entryDate, key, name, quantity);
 	}
 
 	@Override
@@ -106,14 +94,10 @@ public class ProductDTO implements Serializable{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ProductDTO other = (ProductDTO) obj;
-		return Objects.equals(departmentID, other.departmentID) && Objects.equals(description, other.description)
-				&& Objects.equals(entryDate, other.entryDate) && Objects.equals(key, other.key)
-				&& Objects.equals(name, other.name) && Objects.equals(quantity, other.quantity);
+		SimpleProductDTO other = (SimpleProductDTO) obj;
+		return Objects.equals(description, other.description) && Objects.equals(entryDate, other.entryDate)
+				&& Objects.equals(key, other.key) && Objects.equals(name, other.name)
+				&& Objects.equals(quantity, other.quantity);
 	}
-	
-	
-	
-	
-	
+
 }

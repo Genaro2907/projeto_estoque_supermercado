@@ -39,8 +39,8 @@ public class ModelMapper {
 
             if (productDTO.getDepartmentID() != null) {
                 Department department = new Department();
-                department.setId(productDTO.getDepartmentID().getId() != null 
-                    ? productDTO.getDepartmentID().getId() 
+                department.setId(productDTO.getDepartmentID().getKey() != null 
+                    ? productDTO.getDepartmentID().getKey() 
                     : 0L);
                 department.setSector(productDTO.getDepartmentID().getSector());
                 product.setDepartment(department);
@@ -68,7 +68,7 @@ public class ModelMapper {
 
                 if (product.getDepartment() != null) {
                     DepartmentDTO departmentDTO = new DepartmentDTO();
-                    departmentDTO.setId(
+                    departmentDTO.setKey(
                         product.getDepartment().getId() != null 
                         ? product.getDepartment().getId() 
                         : 0L
@@ -77,7 +77,7 @@ public class ModelMapper {
                     productDTO.setDepartmentID(departmentDTO);
                 } else {
                     DepartmentDTO departmentDTO = new DepartmentDTO();
-                    departmentDTO.setId(0L);
+                    departmentDTO.setKey(0L);
                     departmentDTO.setSector("Setor Padrão");
                     productDTO.setDepartmentID(departmentDTO);
                 }

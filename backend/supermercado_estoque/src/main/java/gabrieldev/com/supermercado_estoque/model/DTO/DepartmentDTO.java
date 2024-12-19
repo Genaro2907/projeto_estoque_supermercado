@@ -1,37 +1,49 @@
 package gabrieldev.com.supermercado_estoque.model.DTO;
 
 import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class DepartmentDTO implements Serializable {
-    private static final long serialVersionUID = 1L;
+import org.springframework.hateoas.RepresentationModel;
 
-    private Long id;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.github.dozermapper.core.Mapping;
+
+@JsonPropertyOrder({ "id", "sector", "products"})
+public class DepartmentDTO extends RepresentationModel<DepartmentDTO> implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
+    
+    @JsonProperty("id")
+    @Mapping("id")
+    private Long key;
     private String sector;
     private List<ProductDTO> products = new ArrayList<>();
+    private List<SimpleProductDTO> simpleProducts = new ArrayList<>();
 
     public DepartmentDTO() {
     }
     
-    public DepartmentDTO(Long id) {
-        this.id = id;
+    public DepartmentDTO(Long key) {
+        this.key = key;
     }
-    public DepartmentDTO(Long id, String sector) {
-        this.id = id;
+    public DepartmentDTO(Long key, String sector) {
+        this.key = key;
         this.sector = sector;
     }
+    
+    public Long getKey() {
+		return key;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public void setKey(Long key) {
+		this.key = key;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getSector() {
+	public String getSector() {
         return sector;
     }
 
@@ -46,17 +58,34 @@ public class DepartmentDTO implements Serializable {
     public void setProducts(List<ProductDTO> products) {
         this.products = products;
     }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, sector);
+    public List<SimpleProductDTO> getSimpleProducts() {
+        return simpleProducts;
+    }
+    
+    public void setSimpleProducts(List<SimpleProductDTO> simpleProducts) {
+        this.simpleProducts = simpleProducts;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        DepartmentDTO other = (DepartmentDTO) obj;
-        return Objects.equals(id, other.id) && Objects.equals(sector, other.sector);
-    }
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + Objects.hash(key, products, sector);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DepartmentDTO other = (DepartmentDTO) obj;
+		return Objects.equals(key, other.key) && Objects.equals(products, other.products)
+				&& Objects.equals(sector, other.sector);
+	}
+    
+
 }

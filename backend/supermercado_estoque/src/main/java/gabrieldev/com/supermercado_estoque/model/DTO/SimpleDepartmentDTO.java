@@ -3,29 +3,39 @@ package gabrieldev.com.supermercado_estoque.model.DTO;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class SimpleDepartmentDTO implements Serializable {
-    private static final long serialVersionUID = 1L;
+import org.springframework.hateoas.RepresentationModel;
 
-    private Long id;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.github.dozermapper.core.Mapping;
+
+
+@JsonPropertyOrder({ "id", "sector"})
+public class SimpleDepartmentDTO extends RepresentationModel<SimpleDepartmentDTO> implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
+    @JsonProperty("id")
+    @Mapping("id")
+    private Long key;
     private String sector;
 
     public SimpleDepartmentDTO() {
     }
 
-    public SimpleDepartmentDTO(Long id, String sector) {
-        this.id = id;
+    public SimpleDepartmentDTO(Long key, String sector) {
+        this.key = key;
         this.sector = sector;
     }
 
-    public Long getId() {
-        return id;
-    }
+    public Long getKey() {
+		return key;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public void setKey(Long key) {
+		this.key = key;
+	}
 
-    public String getSector() {
+	public String getSector() {
         return sector;
     }
 
@@ -35,7 +45,7 @@ public class SimpleDepartmentDTO implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, sector);
+		return Objects.hash(key, sector);
 	}
 
 	@Override
@@ -47,7 +57,9 @@ public class SimpleDepartmentDTO implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		SimpleDepartmentDTO other = (SimpleDepartmentDTO) obj;
-		return Objects.equals(id, other.id) && Objects.equals(sector, other.sector);
+		return Objects.equals(key, other.key) && Objects.equals(sector, other.sector);
 	}
+
+	
 
 }

@@ -56,13 +56,13 @@ public class MockDepartment {
 
     public DepartmentDTO mockDTO(Integer number) {
         DepartmentDTO departmentDTO = new DepartmentDTO();
-        departmentDTO.setId(number.longValue());
+        departmentDTO.setKey(number.longValue());
         departmentDTO.setSector("Some Sector " + number);
 
         List<ProductDTO> productDTOs = new ArrayList<>();
         for (int i = 0; i < 5; i++) { 
             ProductDTO productDTO = new ProductDTO();
-            productDTO.setId((long) i + number * 10);
+            productDTO.setKey((long) i + number * 10);
             productDTO.setDescription("Description " + i);
             productDTO.setQuantity(i * 10);
             productDTO.setDepartmentID(departmentDTO); 

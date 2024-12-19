@@ -3,6 +3,8 @@ package gabrieldev.com.supermercado_estoque.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,8 +38,8 @@ public class DepartmentController {
 
     @GetMapping(produces = {
     		MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML})
-    public ResponseEntity<List<DepartmentDTO>> findAll() {
-        List<DepartmentDTO> departments = service.findAll();
+    public ResponseEntity<CollectionModel<EntityModel<DepartmentDTO>>> findAll() {
+        CollectionModel<EntityModel<DepartmentDTO>> departments = service.findAll();
         return ResponseEntity.ok(departments);
     }
 
@@ -67,8 +69,8 @@ public class DepartmentController {
     @GetMapping(value = "/sector", 
     			produces = {
     					MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML})
-    public ResponseEntity<List<SimpleDepartmentDTO>> findDepartmentsWithoutProducts() {
-        List<SimpleDepartmentDTO> departments = service.findDepartmentsWithoutProducts();
+    public ResponseEntity<List<EntityModel<SimpleDepartmentDTO>>> findDepartmentsWithoutProducts() {
+        List<EntityModel<SimpleDepartmentDTO>> departments = service.findDepartmentsWithoutProducts();
         return ResponseEntity.ok(departments);
     }
     

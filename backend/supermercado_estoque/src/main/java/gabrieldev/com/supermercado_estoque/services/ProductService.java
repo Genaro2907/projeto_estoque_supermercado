@@ -36,7 +36,7 @@ public class ProductService {
     }
 
     public ProductDTO create(ProductDTO productDTO) {
-        Department department = departmentRepository.findById(productDTO.getDepartmentID().getId())
+        Department department = departmentRepository.findById(productDTO.getDepartmentID().getKey())
             .orElseThrow(() -> new ResourceNotFoundException("Departamento não encontrado"));
 
         Product product = new Product();
@@ -54,7 +54,7 @@ public class ProductService {
         Product existingProduct = productRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado com ID: " + id));
 
-        Department department = departmentRepository.findById(productDTO.getDepartmentID().getId())
+        Department department = departmentRepository.findById(productDTO.getDepartmentID().getKey())
             .orElseThrow(() -> new ResourceNotFoundException("Departamento não encontrado"));
 
         existingProduct.setName(productDTO.getName());
@@ -83,7 +83,7 @@ public class ProductService {
     private ProductDTO convertToDTO(Product product) {
         ProductDTO productDTO = new ProductDTO();
 
-        productDTO.setId(product.getId());
+        productDTO.setKey(product.getId());
         productDTO.setName(product.getName());
         productDTO.setDescription(product.getDescription());
         productDTO.setQuantity(product.getQuantity());
@@ -91,7 +91,7 @@ public class ProductService {
 
         if (product.getDepartment() != null) {
             DepartmentDTO departmentDTO = new DepartmentDTO();
-            departmentDTO.setId(product.getDepartment().getId());
+            departmentDTO.setKey(product.getDepartment().getId());
             departmentDTO.setSector(product.getDepartment().getSector());
             productDTO.setDepartmentID(departmentDTO);
         }

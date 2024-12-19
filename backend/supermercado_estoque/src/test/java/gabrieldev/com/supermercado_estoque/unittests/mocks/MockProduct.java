@@ -55,10 +55,10 @@ public class MockProduct {
         ProductDTO productDTO = new ProductDTO();
         DepartmentDTO departmentDTO = new DepartmentDTO();
         
-        departmentDTO.setId(number.longValue());
+        departmentDTO.setKey(number.longValue());
         departmentDTO.setSector("Sector Test" + number);
         
-        productDTO.setId(number.longValue());
+        productDTO.setKey(number.longValue());
         productDTO.setName("Name Test" + number);
         productDTO.setDescription("Description Test" + number);
         productDTO.setQuantity(number);
