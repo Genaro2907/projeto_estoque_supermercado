@@ -12,4 +12,6 @@ import gabrieldev.com.supermercado_estoque.model.DTO.DepartmentDTO;
 public interface DepartmentRepository extends JpaRepository<Department, Long>{
 	@Query("SELECT new gabrieldev.com.supermercado_estoque.model.DTO.DepartmentDTO(d.id, d.sector) FROM Department d")
 	List<DepartmentDTO> findSimpleDepartments();
+	
+	Department findBySector(String sector);
 }

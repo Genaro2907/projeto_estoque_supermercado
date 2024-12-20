@@ -103,9 +103,13 @@
 			<version>2.3.1</version>
 		</dependency>
 		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.glassfish.jaxb</groupId>
 			<artifactId>jaxb-runtime</artifactId>
-			</dependency>
+		</dependency>
 	</dependencies>
 
 	<build>

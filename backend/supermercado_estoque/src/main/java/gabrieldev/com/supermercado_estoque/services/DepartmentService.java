@@ -4,9 +4,10 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import gabrieldev.com.supermercado_estoque.controllers.DepartmentController;
+import gabrieldev.com.supermercado_estoque.controllers.exceptions.BusinessException;
 import gabrieldev.com.supermercado_estoque.controllers.exceptions.ResourceNotFoundException;
 import gabrieldev.com.supermercado_estoque.model.Department;
 import gabrieldev.com.supermercado_estoque.model.Product;
@@ -22,108 +24,174 @@ import gabrieldev.com.supermercado_estoque.model.DTO.SimpleDepartmentDTO;
 import gabrieldev.com.supermercado_estoque.repository.DepartmentRepository;
 import gabrieldev.com.supermercado_estoque.repository.ProductRepository;
 import gabrieldev.com.supermercado_estoque.services.mapper.DepartmentMapper;
+import gabrieldev.com.supermercado_estoque.util.DepartmentValidator;
 
 @Service
 public class DepartmentService {
 
-	@Autowired
-	private DepartmentRepository departmentRepository;
-	
-	@Autowired
-	private DepartmentMapper departmentMapper;
+    private static final Logger logger = LoggerFactory.getLogger(DepartmentService.class);
 
-	@Autowired
-	private ProductRepository productRepository;
-	
-	private Logger logger = Logger.getLogger(DepartmentService.class.getName());
+    @Autowired
+    private DepartmentRepository departmentRepository;
+    
+    @Autowired
+    private DepartmentMapper departmentMapper;
 
+    @Autowired
+    private ProductRepository productRepository;
+    
+    @Autowired
+    private DepartmentValidator departmentValidator;
 
-	public CollectionModel<EntityModel<DepartmentDTO>> findAll() {
-	    logger.info("Finding all departments!");
-	    List<EntityModel<DepartmentDTO>> departments = departmentRepository.findAll()
-	        .stream()
-	        .map(department -> {
-	            DepartmentDTO dto = departmentMapper.SimpleProducttoDTO(department);
-	            return EntityModel.of(dto,
-	                linkTo(methodOn(DepartmentController.class).findById(department.getId())).withSelfRel());
-	        })
-	        .collect(Collectors.toList());
+    public CollectionModel<EntityModel<DepartmentDTO>> findAll() {
+        logger.info("Finding all departments");
+        try {
+            List<EntityModel<DepartmentDTO>> departments = departmentRepository.findAll()
+                .stream()
+                .map(department -> {
+                    DepartmentDTO dto = departmentMapper.SimpleProducttoDTO(department);
+                    return EntityModel.of(dto,
+                        linkTo(methodOn(DepartmentController.class).findById(department.getId())).withSelfRel());
+                })
+                .collect(Collectors.toList());
 
-	    return CollectionModel.of(departments,
-	        linkTo(methodOn(DepartmentController.class).findAll()).withSelfRel());
-	}
+            if (departments.isEmpty()) {
+                logger.warn("No departments found");
+            }
 
-	public DepartmentDTO findById(Long id) {
-	    logger.info("Finding one department!");
-	    
-	    var dto = departmentRepository.findById(id)
-	        .map(departmentMapper::toDTO)
-	        .orElseThrow(() -> new ResourceNotFoundException("Departamento não encontrado com ID: " + id));
-	    
-	    dto.add(linkTo(methodOn(DepartmentController.class).findById(id)).withSelfRel());
-	    return dto;
-	}
+            return CollectionModel.of(departments,
+                linkTo(methodOn(DepartmentController.class).findAll()).withSelfRel());
+        } catch (Exception e) {
+            logger.error("Error while finding all departments", e);
+            throw new BusinessException("Error while retrieving departments: " + e.getMessage());
+        }
+    }
 
-	@Transactional
-	public DepartmentDTO create(DepartmentDTO departmentDTO) {
-		
-		logger.info("Creating one person!");
-		Department department = departmentMapper.toEntity(departmentDTO);
-		Department savedDepartment = departmentRepository.save(department);
+    public DepartmentDTO findById(Long id) {
+        logger.info("Finding department with id: {}", id);
+        
+        if (id == null) {
+            throw new BusinessException("Department ID cannot be null");
+        }
 
-		if (departmentDTO.getProducts() != null && !departmentDTO.getProducts().isEmpty()) {
-			List<Product> products = departmentDTO.getProducts().stream().map(productDTO -> {
-				Product product = new Product();
-				product.setName(productDTO.getName());
-				product.setDescription(productDTO.getDescription());
-				product.setQuantity(productDTO.getQuantity());
-				product.setEntryDate(productDTO.getEntryDate());
-				product.setDepartment(savedDepartment);
-				return product;
-			}).collect(Collectors.toList());
+        var department = departmentRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Department", "id", id));
+        
+        var dto = departmentMapper.toDTO(department);
+        dto.add(linkTo(methodOn(DepartmentController.class).findById(id)).withSelfRel());
+        
+        return dto;
+    }
 
-			productRepository.saveAll(products);
+    @Transactional
+    public DepartmentDTO create(DepartmentDTO departmentDTO) {
+        logger.info("Creating new department");
+        
+        departmentValidator.validateDepartmentDTO(departmentDTO);
 
-			savedDepartment.setProducts(products);
-		}
+        try {
+            Department department = departmentMapper.toEntity(departmentDTO);
+            Department savedDepartment = departmentRepository.save(department);
 
-		var dto = departmentMapper.toDTO(savedDepartment);
-		dto.add(linkTo(methodOn(DepartmentController.class).findById(dto.getKey())).withSelfRel());
-		return dto;
-	}
+            if (departmentDTO.getProducts() != null && !departmentDTO.getProducts().isEmpty()) {
+                List<Product> products = departmentDTO.getProducts().stream()
+                    .map(productDTO -> {
+                    	departmentValidator.validateProductDTO(productDTO);
+                        Product product = new Product();
+                        product.setName(productDTO.getName());
+                        product.setDescription(productDTO.getDescription());
+                        product.setQuantity(productDTO.getQuantity());
+                        product.setEntryDate(productDTO.getEntryDate());
+                        product.setDepartment(savedDepartment);
+                        return product;
+                    })
+                    .collect(Collectors.toList());
 
-	@Transactional
-	public DepartmentDTO update(Long id, DepartmentDTO departmentDTO) {
-		
-		logger.info("Updating one department!");
-		Department existingDepartment = departmentRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Departamento não encontrado com ID: " + id));
+                productRepository.saveAll(products);
+                savedDepartment.setProducts(products);
+            }
 
-		existingDepartment.setSector(departmentDTO.getSector());
+            var dto = departmentMapper.toDTO(savedDepartment);
+            dto.add(linkTo(methodOn(DepartmentController.class).findById(dto.getKey())).withSelfRel());
+            return dto;
+        } catch (Exception e) {
+            logger.error("Error while creating department", e);
+            throw new BusinessException("Error while creating department: " + e.getMessage());
+        }
+    }
 
-		Department updatedDepartment = departmentRepository.save(existingDepartment);
-		var dto = departmentMapper.toDTO(updatedDepartment);
-		dto.add(linkTo(methodOn(DepartmentController.class).findById(dto.getKey())).withSelfRel());
-		return dto;
-	}
+    @Transactional
+    public DepartmentDTO update(Long id, DepartmentDTO departmentDTO) {
+        logger.info("Updating department with id: {}", id);
+        
+        if (id == null) {
+            throw new BusinessException("Department ID cannot be null");
+        }
 
-	@Transactional
-	public void delete(Long id) {
-		
-		logger.info("Deleting one department!");
-		Department department = departmentRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Departamento não encontrado com ID: " + id));
-		departmentRepository.delete(department);
-	}
+        departmentValidator.validateDepartmentDTO(departmentDTO);
 
-	public List<EntityModel<SimpleDepartmentDTO>> findDepartmentsWithoutProducts() {
-	    logger.info("Finding all departments without Products!");
-	    return departmentRepository.findAll().stream()
-	        .map(department -> {
-	            SimpleDepartmentDTO dto = new SimpleDepartmentDTO(department.getId(), department.getSector());
-	            return EntityModel.of(dto,
-	                linkTo(methodOn(DepartmentController.class).findById(department.getId())).withSelfRel());
-	        })
-	        .collect(Collectors.toList());
-	}
+        try {
+            Department existingDepartment = departmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Department", "id", id));
+
+            Department departmentWithSameSector = departmentRepository.findBySector(departmentDTO.getSector());
+            if (departmentWithSameSector != null && !departmentWithSameSector.getId().equals(id)) {
+                throw new BusinessException("Sector already exists in another department");
+            }
+
+            existingDepartment.setSector(departmentDTO.getSector());
+
+            Department updatedDepartment = departmentRepository.save(existingDepartment);
+            var dto = departmentMapper.toDTO(updatedDepartment);
+            dto.add(linkTo(methodOn(DepartmentController.class).findById(dto.getKey())).withSelfRel());
+            return dto;
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Error while updating department", e);
+            throw new BusinessException("Error while updating department: " + e.getMessage());
+        }
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        logger.info("Deleting department with id: {}", id);
+        
+        if (id == null) {
+            throw new BusinessException("Department ID cannot be null");
+        }
+
+        try {
+            Department department = departmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Department", "id", id));
+
+            if (!department.getProducts().isEmpty()) {
+                throw new BusinessException("Cannot delete department with associated products");
+            }
+
+            departmentRepository.delete(department);
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Error while deleting department", e);
+            throw new BusinessException("Error while deleting department: " + e.getMessage());
+        }
+    }
+
+    public List<EntityModel<SimpleDepartmentDTO>> findDepartmentsWithoutProducts() {
+        logger.info("Finding departments without products");
+        try {
+            return departmentRepository.findAll().stream()
+                .filter(department -> department.getProducts() == null || department.getProducts().isEmpty())
+                .map(department -> {
+                    SimpleDepartmentDTO dto = new SimpleDepartmentDTO(department.getId(), department.getSector());
+                    return EntityModel.of(dto,
+                        linkTo(methodOn(DepartmentController.class).findById(department.getId())).withSelfRel());
+                })
+                .collect(Collectors.toList());
+        } catch (Exception e) {
+            logger.error("Error while finding departments without products", e);
+            throw new BusinessException("Error while retrieving departments without products: " + e.getMessage());
+        }
+    }
 }

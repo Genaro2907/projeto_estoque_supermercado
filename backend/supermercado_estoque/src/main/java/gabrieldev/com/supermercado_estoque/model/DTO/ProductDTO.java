@@ -4,12 +4,14 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
+import org.springframework.hateoas.RepresentationModel;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.github.dozermapper.core.Mapping;
 
 @JsonPropertyOrder({ "id", "name", "description", "quantity", "entryDate", "departmentID"})
-public class ProductDTO implements Serializable{
+public class ProductDTO extends RepresentationModel<ProductDTO> implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@JsonProperty("id")
@@ -111,9 +113,4 @@ public class ProductDTO implements Serializable{
 				&& Objects.equals(entryDate, other.entryDate) && Objects.equals(key, other.key)
 				&& Objects.equals(name, other.name) && Objects.equals(quantity, other.quantity);
 	}
-	
-	
-	
-	
-	
 }

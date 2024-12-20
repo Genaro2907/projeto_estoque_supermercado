@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.github.dozermapper.core.Mapping;
 
-@JsonPropertyOrder({ "id", "sector", "products"})
+@JsonPropertyOrder({ "id", "sector", "products", "simpleProducts"})
 public class DepartmentDTO extends RepresentationModel<DepartmentDTO> implements Serializable {
     private static final long serialVersionUID = 1L;
     
@@ -21,7 +21,9 @@ public class DepartmentDTO extends RepresentationModel<DepartmentDTO> implements
     @Mapping("id")
     private Long key;
     private String sector;
+    @JsonProperty("detailed_products")
     private List<ProductDTO> products = new ArrayList<>();
+    @JsonProperty("simple_products")
     private List<SimpleProductDTO> simpleProducts = new ArrayList<>();
 
     public DepartmentDTO() {

@@ -1,8 +1,8 @@
 package gabrieldev.com.supermercado_estoque.controllers;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,8 +35,8 @@ public class ProductController {
 
     @GetMapping(produces = {
     		MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML})
-    public ResponseEntity<List<ProductDTO>> findAll() {
-        List<ProductDTO> products = productService.findAll();
+    public ResponseEntity<CollectionModel<EntityModel<ProductDTO>>> findAll() {
+        CollectionModel<EntityModel<ProductDTO>> products = productService.findAll();
         return ResponseEntity.ok(products);
     }
 
@@ -66,8 +66,8 @@ public class ProductController {
 
     @GetMapping(value = "/department/{departmentId}", produces = {
 			MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML})
-    public ResponseEntity<List<ProductDTO>> findByDepartment(@PathVariable Long departmentId) {
-        List<ProductDTO> products = productService.findByDepartment(departmentId);
+    public ResponseEntity<CollectionModel<EntityModel<ProductDTO>>> findByDepartment(@PathVariable Long departmentId) {
+        CollectionModel<EntityModel<ProductDTO>> products = (CollectionModel<EntityModel<ProductDTO>>) productService.findByDepartment(departmentId);
         return ResponseEntity.ok(products);
     }
 }
