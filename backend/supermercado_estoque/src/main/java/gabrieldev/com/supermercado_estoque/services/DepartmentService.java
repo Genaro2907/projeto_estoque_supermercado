@@ -49,7 +49,7 @@ public class DepartmentService {
             List<EntityModel<DepartmentDTO>> departments = departmentRepository.findAll()
                 .stream()
                 .map(department -> {
-                    DepartmentDTO dto = departmentMapper.SimpleProducttoDTO(department);
+                    DepartmentDTO dto = departmentMapper.SimpleProductoDTO(department);
                     return EntityModel.of(dto,
                         linkTo(methodOn(DepartmentController.class).findById(department.getId())).withSelfRel());
                 })
@@ -161,21 +161,14 @@ public class DepartmentService {
             throw new BusinessException("Department ID cannot be null");
         }
 
-        try {
-            Department department = departmentRepository.findById(id)
+        Department department = departmentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Department", "id", id));
 
-            if (!department.getProducts().isEmpty()) {
-                throw new BusinessException("Cannot delete department with associated products");
-            }
-
-            departmentRepository.delete(department);
-        } catch (ResourceNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            logger.error("Error while deleting department", e);
-            throw new BusinessException("Error while deleting department: " + e.getMessage());
+        if (productRepository.countByDepartmentId(id) > 0) {
+            throw new BusinessException("Cannot delete department with associated products");
         }
+
+        departmentRepository.delete(department);
     }
 
     public List<EntityModel<SimpleDepartmentDTO>> findDepartmentsWithoutProducts() {
@@ -184,7 +177,7 @@ public class DepartmentService {
             return departmentRepository.findAll().stream()
                 .filter(department -> department.getProducts() == null || department.getProducts().isEmpty())
                 .map(department -> {
-                    SimpleDepartmentDTO dto = new SimpleDepartmentDTO(department.getId(), department.getSector());
+                    SimpleDepartmentDTO dto = departmentMapper.toSimpleDepartmentDTO(department);
                     return EntityModel.of(dto,
                         linkTo(methodOn(DepartmentController.class).findById(department.getId())).withSelfRel());
                 })
@@ -194,4 +187,5 @@ public class DepartmentService {
             throw new BusinessException("Error while retrieving departments without products: " + e.getMessage());
         }
     }
+    
 }

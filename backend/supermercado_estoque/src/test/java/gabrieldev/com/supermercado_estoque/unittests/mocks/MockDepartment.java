@@ -10,6 +10,8 @@ import gabrieldev.com.supermercado_estoque.model.DTO.ProductDTO;
 
 public class MockDepartment {
 
+    private final MockProduct mockProduct = new MockProduct();
+
     public Department mockEntity() {
         return mockEntity(0);
     }
@@ -41,16 +43,12 @@ public class MockDepartment {
 
         List<Product> products = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            Product product = new Product();
-            product.setId((long) i);
-            product.setName("Product " + i);
-            product.setDescription("Description " + i);
-            product.setQuantity(i);
-            product.setDepartment(department);
+            Product product = mockProduct.mockEntity(i);
+            product.setDepartment(department); 
             products.add(product);
         }
 
-        department.setProducts(products); 
+        department.setProducts(products);
         return department;
     }
 
@@ -60,16 +58,13 @@ public class MockDepartment {
         departmentDTO.setSector("Some Sector " + number);
 
         List<ProductDTO> productDTOs = new ArrayList<>();
-        for (int i = 0; i < 5; i++) { 
-            ProductDTO productDTO = new ProductDTO();
-            productDTO.setKey((long) i + number * 10);
-            productDTO.setDescription("Description " + i);
-            productDTO.setQuantity(i * 10);
+        for (int i = 0; i < 5; i++) {
+            ProductDTO productDTO = mockProduct.mockDTO(i);
             productDTO.setDepartmentID(departmentDTO); 
             productDTOs.add(productDTO);
         }
 
-        departmentDTO.setProducts(productDTOs); 
+        departmentDTO.setProducts(productDTOs);
         return departmentDTO;
     }
 }
