@@ -13,7 +13,7 @@ import gabrieldev.com.supermercado_estoque.model.DTO.SimpleProductDTO;
 
 @Component
 public class DepartmentMapper {
-    
+
     public DepartmentDTO toDTO(Department department) {
         DepartmentDTO dto = new DepartmentDTO(department.getId(), department.getSector());
         
@@ -25,7 +25,8 @@ public class DepartmentMapper {
         
         return dto;
     }
-    public DepartmentDTO SimpleProductoDTO(Department department) {
+    
+    public DepartmentDTO simpleProductToDTO(Department department) {
         DepartmentDTO dto = new DepartmentDTO(department.getId(), department.getSector());
         
         if (department.getProducts() != null) {
@@ -36,7 +37,7 @@ public class DepartmentMapper {
         
         return dto;
     }
-    
+
     public SimpleDepartmentDTO toSimpleDepartmentDTO(Department department) {
         if (department == null) {
             return null;
@@ -44,13 +45,13 @@ public class DepartmentMapper {
         SimpleDepartmentDTO dto = new SimpleDepartmentDTO();
         dto.setKey(department.getId());
         dto.setSector(department.getSector());
-
         return dto;
     }
+    
     public Department toEntity(DepartmentDTO dto) {
         return new Department(dto.getKey(), dto.getSector());
     }
-    
+
     private ProductDTO toProductDTO(Product product) {
         ProductDTO dto = new ProductDTO();
         dto.setKey(product.getId());
@@ -67,9 +68,8 @@ public class DepartmentMapper {
         return dto;
     }
     
-    
     private SimpleProductDTO toSimpleProductDTO(Product product) {
-    	SimpleProductDTO dto = new SimpleProductDTO();
+        SimpleProductDTO dto = new SimpleProductDTO();
         dto.setKey(product.getId());
         dto.setName(product.getName());
         dto.setDescription(product.getDescription());

@@ -49,7 +49,7 @@ public class DepartmentService {
             List<EntityModel<DepartmentDTO>> departments = departmentRepository.findAll()
                 .stream()
                 .map(department -> {
-                    DepartmentDTO dto = departmentMapper.SimpleProductoDTO(department);
+                    DepartmentDTO dto = departmentMapper.simpleProductToDTO(department);
                     return EntityModel.of(dto,
                         linkTo(methodOn(DepartmentController.class).findById(department.getId())).withSelfRel());
                 })
@@ -86,7 +86,7 @@ public class DepartmentService {
     @Transactional
     public DepartmentDTO create(DepartmentDTO departmentDTO) {
         logger.info("Creating new department");
-        
+        if(departmentDTO == null) throw new BusinessException("It is not allowed to persist a null object!");
         departmentValidator.validateDepartmentDTO(departmentDTO);
 
         try {
@@ -187,5 +187,7 @@ public class DepartmentService {
             throw new BusinessException("Error while retrieving departments without products: " + e.getMessage());
         }
     }
+
+
     
 }

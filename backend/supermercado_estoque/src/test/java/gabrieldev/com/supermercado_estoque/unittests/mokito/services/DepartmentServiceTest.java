@@ -2,11 +2,13 @@ package gabrieldev.com.supermercado_estoque.unittests.mokito.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import gabrieldev.com.supermercado_estoque.controllers.exceptions.BusinessException;
 import gabrieldev.com.supermercado_estoque.model.Department;
 import gabrieldev.com.supermercado_estoque.model.DTO.DepartmentDTO;
 import gabrieldev.com.supermercado_estoque.repository.DepartmentRepository;
@@ -113,6 +116,17 @@ class DepartmentServiceTest {
         assertTrue(result.toString().contains("links: [</api/department/1>;rel=\"self\"]"),
                 "Self-link should be present");
     }
+    @Test
+    void testCreateWithNullDepartment() {
+    	Exception exception = assertThrows(BusinessException.class, () -> {
+    		service.create(null);
+    	});
+    	String expectedMessage = "It is not allowed to persist a null object!";
+    	String actualMessage = exception.getMessage();
+    	System.out.println(expectedMessage);
+    	
+    	assertTrue(actualMessage.contains(expectedMessage));
+    }
 
     @Test
     void testUpdate() {
@@ -145,6 +159,17 @@ class DepartmentServiceTest {
         assertTrue(result.toString().contains("links: [</api/department/1>;rel=\"self\"]"),
                 "Self-link should be present");
     }
+    @Test
+    void testUpdateWithNullDepartment() {
+    	Exception exception = assertThrows(BusinessException.class, () -> {
+    		service.update(null, null);
+    	});
+    	String expectedMessage = "Department ID cannot be null";
+    	String actualMessage = exception.getMessage();
+    	
+    	assertTrue(actualMessage.contains(expectedMessage));
+    }
+
 
     @Test
     void testDelete() {
@@ -158,13 +183,44 @@ class DepartmentServiceTest {
 
         verify(repository, times(1)).delete(department);
     }
+    
+    @Test
+    void testFindAll() {
+        List<Department> mockList = input.mockEntityList();
+        when(repository.findAll()).thenReturn(mockList);
+
+        var sectors = service.findAll();
+
+        assertNotNull(sectors, "The result list should not be null");
+        assertEquals(14, sectors.size(), "The result list should contain 14 items");
+
+        var sectorOneModel = sectors.get(1); // EntityModel<DepartmentDTO>
+        assertNotNull(sectorOneModel, "The second department model should not be null");
+
+        var sectorOne = sectorOneModel.getContent(); // DepartmentDTO
+        assertNotNull(sectorOne, "The content of the second department should not be null");
+        assertNotNull(sectorOne.getKey(), "The ID of the second department should not be null");
+
+        assertEquals("Some Sector 1", sectorOne.getSector(), "The sector name should match");
+        assertNotNull(sectorOne.getProducts(), "The products list should not be null");
+        assertEquals(5, sectorOne.getProducts().size(), "There should be 5 products in the list");
+
+        var product = sectorOne.getProducts().get(0); // ProductDTO
+        assertNotNull(product, "The first product should not be null");
+        assertEquals("Description Test0", product.getDescription(), "The product description should match");
+        assertEquals(0, product.getQuantity(), "The product quantity should match");
+
+        assertTrue(sectorOneModel.getLinks().toString().contains("</api/department/1>;rel=\"self\""),
+            "Self-link should be present");
+    }
+
 
 
 	  /*
 	 * @Test void testFindDepartmentsWithoutProducts() {
 	 * fail("Not yet implemented"); }
 	 * 
-	 * @Test void testFindAll() { fail("Not yet implemented"); }
+	 * 
 	 */
 
 }
