@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,25 +41,20 @@ public class DepartmentService {
     
     @Autowired
     private DepartmentValidator departmentValidator;
-
-    public CollectionModel<EntityModel<DepartmentDTO>> findAll() {
-        logger.info("Finding all departments");
+    
+    
+    @Transactional(readOnly = true)
+    public List<DepartmentDTO> findAll() {
         try {
-            List<EntityModel<DepartmentDTO>> departments = departmentRepository.findAll()
-                .stream()
-                .map(department -> {
-                    DepartmentDTO dto = departmentMapper.simpleProductToDTO(department);
-                    return EntityModel.of(dto,
-                        linkTo(methodOn(DepartmentController.class).findById(department.getId())).withSelfRel());
-                })
-                .collect(Collectors.toList());
-
+        	//logger.info("Finding all departments");
+        	var departments =  DepartmentMapper.parseListObjects(departmentRepository.findAll(), DepartmentDTO.class);
             if (departments.isEmpty()) {
                 logger.warn("No departments found");
             }
-
-            return CollectionModel.of(departments,
-                linkTo(methodOn(DepartmentController.class).findAll()).withSelfRel());
+            departments
+			.stream()
+			.forEach(p -> p.add(linkTo(methodOn(DepartmentController.class).findById(p.getKey())).withSelfRel()));
+            return departments;
         } catch (Exception e) {
             logger.error("Error while finding all departments", e);
             throw new BusinessException("Error while retrieving departments: " + e.getMessage());
@@ -77,7 +71,7 @@ public class DepartmentService {
         var department = departmentRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Department", "id", id));
         
-        var dto = departmentMapper.toDTO(department);
+        var dto = departmentMapper.parseObject(department, DepartmentDTO.class);
         dto.add(linkTo(methodOn(DepartmentController.class).findById(id)).withSelfRel());
         
         return dto;

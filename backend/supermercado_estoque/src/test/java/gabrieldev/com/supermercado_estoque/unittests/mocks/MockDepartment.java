@@ -60,7 +60,12 @@ public class MockDepartment {
         List<ProductDTO> productDTOs = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             ProductDTO productDTO = mockProduct.mockDTO(i);
-            productDTO.setDepartmentID(departmentDTO); 
+
+            DepartmentDTO productDepartment = new DepartmentDTO();
+            productDepartment.setKey(departmentDTO.getKey());
+            productDepartment.setSector(departmentDTO.getSector());
+            
+            productDTO.setDepartmentID(productDepartment); 
             productDTOs.add(productDTO);
         }
 

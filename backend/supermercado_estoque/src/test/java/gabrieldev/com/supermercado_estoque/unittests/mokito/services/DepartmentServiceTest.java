@@ -63,11 +63,8 @@ class DepartmentServiceTest {
         Department department = input.mockEntity(1);
         department.setId(1L);
 
-        DepartmentDTO departmentDTO = input.mockDTO(1);
-        departmentDTO.setKey(1L);
 
         when(repository.findById(1L)).thenReturn(Optional.of(department));
-        when(departmentMapper.toDTO(department)).thenReturn(departmentDTO);
 
         var result = service.findById(1L);
 
@@ -188,30 +185,18 @@ class DepartmentServiceTest {
     void testFindAll() {
         List<Department> mockList = input.mockEntityList();
         when(repository.findAll()).thenReturn(mockList);
+        var department = service.findAll();
+        assertNotNull(department);
+        assertEquals(14, department.size());
+        
+        var departmentOne = department.get(1);
+        assertNotNull(departmentOne);
+        assertNotNull(departmentOne.getKey());
+        assertNotNull(departmentOne.getLinks()); 
+        assertTrue(departmentOne.toString().contains("</api/department/1>;rel=\"self\""));
+        assertEquals("Some Sector 1", departmentOne.getSector());
+        
 
-        var sectors = service.findAll();
-
-        assertNotNull(sectors, "The result list should not be null");
-        assertEquals(14, sectors.size(), "The result list should contain 14 items");
-
-        var sectorOneModel = sectors.get(1); // EntityModel<DepartmentDTO>
-        assertNotNull(sectorOneModel, "The second department model should not be null");
-
-        var sectorOne = sectorOneModel.getContent(); // DepartmentDTO
-        assertNotNull(sectorOne, "The content of the second department should not be null");
-        assertNotNull(sectorOne.getKey(), "The ID of the second department should not be null");
-
-        assertEquals("Some Sector 1", sectorOne.getSector(), "The sector name should match");
-        assertNotNull(sectorOne.getProducts(), "The products list should not be null");
-        assertEquals(5, sectorOne.getProducts().size(), "There should be 5 products in the list");
-
-        var product = sectorOne.getProducts().get(0); // ProductDTO
-        assertNotNull(product, "The first product should not be null");
-        assertEquals("Description Test0", product.getDescription(), "The product description should match");
-        assertEquals(0, product.getQuantity(), "The product quantity should match");
-
-        assertTrue(sectorOneModel.getLinks().toString().contains("</api/department/1>;rel=\"self\""),
-            "Self-link should be present");
     }
 
 

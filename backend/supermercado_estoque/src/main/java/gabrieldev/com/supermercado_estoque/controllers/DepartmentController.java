@@ -3,7 +3,6 @@ package gabrieldev.com.supermercado_estoque.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,8 +37,8 @@ public class DepartmentController {
 
     @GetMapping(produces = {
     		MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML})
-    public ResponseEntity<CollectionModel<EntityModel<DepartmentDTO>>> findAll() {
-        CollectionModel<EntityModel<DepartmentDTO>> departments = service.findAll();
+    public ResponseEntity<List<DepartmentDTO>> findAll() {
+        List<DepartmentDTO> departments = service.findAll();
         return ResponseEntity.ok(departments);
     }
 

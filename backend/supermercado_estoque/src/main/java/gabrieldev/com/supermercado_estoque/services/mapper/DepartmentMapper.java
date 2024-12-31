@@ -1,8 +1,13 @@
 package gabrieldev.com.supermercado_estoque.services.mapper;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
+
+import com.github.dozermapper.core.DozerBeanMapperBuilder;
+import com.github.dozermapper.core.Mapper;
 
 import gabrieldev.com.supermercado_estoque.model.Department;
 import gabrieldev.com.supermercado_estoque.model.Product;
@@ -14,6 +19,21 @@ import gabrieldev.com.supermercado_estoque.model.DTO.SimpleProductDTO;
 @Component
 public class DepartmentMapper {
 
+	
+	private static  Mapper mapper = DozerBeanMapperBuilder.buildDefault();
+	
+	public static <O, D> List<D> parseListObjects(List<O> origin, Class<D> destination) {
+		List<D> destinationObjects = new ArrayList<D>();
+		for (O o : origin) {
+			destinationObjects.add( mapper.map(o, destination));
+		}
+		return destinationObjects;
+	}
+	
+	public  <O, D> D parseObject(O origin, Class<D> destination) {
+		return mapper.map(origin, destination);
+	}
+	
     public DepartmentDTO toDTO(Department department) {
         DepartmentDTO dto = new DepartmentDTO(department.getId(), department.getSector());
         
