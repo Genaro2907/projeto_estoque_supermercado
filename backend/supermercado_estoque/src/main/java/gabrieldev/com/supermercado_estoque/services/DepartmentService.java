@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,7 +45,6 @@ public class DepartmentService {
     @Transactional(readOnly = true)
     public List<DepartmentDTO> findAll() {
         try {
-        	//logger.info("Finding all departments");
         	var departments =  DepartmentMapper.parseListObjects(departmentRepository.findAll(), DepartmentDTO.class);
             if (departments.isEmpty()) {
                 logger.warn("No departments found");
@@ -54,6 +52,7 @@ public class DepartmentService {
             departments
 			.stream()
 			.forEach(p -> p.add(linkTo(methodOn(DepartmentController.class).findById(p.getKey())).withSelfRel()));
+            logger.info("Finding all departments");
             return departments;
         } catch (Exception e) {
             logger.error("Error while finding all departments", e);
@@ -71,7 +70,7 @@ public class DepartmentService {
         var department = departmentRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Department", "id", id));
         
-        var dto = departmentMapper.parseObject(department, DepartmentDTO.class);
+        var dto = departmentMapper.toDTO(department);
         dto.add(linkTo(methodOn(DepartmentController.class).findById(id)).withSelfRel());
         
         return dto;
@@ -165,22 +164,24 @@ public class DepartmentService {
         departmentRepository.delete(department);
     }
 
-    public List<EntityModel<SimpleDepartmentDTO>> findDepartmentsWithoutProducts() {
+    public List<SimpleDepartmentDTO>findDepartmentsWithoutProducts() {
         logger.info("Finding departments without products");
         try {
-            return departmentRepository.findAll().stream()
-                .filter(department -> department.getProducts() == null || department.getProducts().isEmpty())
-                .map(department -> {
-                    SimpleDepartmentDTO dto = departmentMapper.toSimpleDepartmentDTO(department);
-                    return EntityModel.of(dto,
-                        linkTo(methodOn(DepartmentController.class).findById(department.getId())).withSelfRel());
-                })
-                .collect(Collectors.toList());
+        	var departments =  DepartmentMapper.parseListObjects(departmentRepository.findAll(), SimpleDepartmentDTO.class);
+            if (departments.isEmpty()) {
+                logger.warn("No departments found");
+            }
+            departments
+			.stream()
+			.forEach(p -> p.add(linkTo(methodOn(DepartmentController.class).findById(p.getKey())).withSelfRel()));
+            logger.info("Finding all departments");
+            return departments;
         } catch (Exception e) {
-            logger.error("Error while finding departments without products", e);
-            throw new BusinessException("Error while retrieving departments without products: " + e.getMessage());
+            logger.error("Error while finding all departments", e);
+            throw new BusinessException("Error while retrieving departments: " + e.getMessage());
         }
     }
+    
 
 
     

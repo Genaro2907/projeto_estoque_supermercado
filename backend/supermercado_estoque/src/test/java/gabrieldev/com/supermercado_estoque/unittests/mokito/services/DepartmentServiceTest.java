@@ -62,9 +62,11 @@ class DepartmentServiceTest {
     void testFindById() {
         Department department = input.mockEntity(1);
         department.setId(1L);
-
+        DepartmentDTO departmentDTO = input.mockDTO(1);
+        departmentDTO.setKey(1L);
 
         when(repository.findById(1L)).thenReturn(Optional.of(department));
+        when(departmentMapper.toDTO(department)).thenReturn(departmentDTO);
 
         var result = service.findById(1L);
 
@@ -195,17 +197,23 @@ class DepartmentServiceTest {
         assertNotNull(departmentOne.getLinks()); 
         assertTrue(departmentOne.toString().contains("</api/department/1>;rel=\"self\""));
         assertEquals("Some Sector 1", departmentOne.getSector());
+        assertNotNull(departmentOne.getProducts());
+        
+        var departmentFour = department.get(4);
+        assertNotNull(departmentFour);
+        assertNotNull(departmentFour.getKey());
+        assertNotNull(departmentFour.getLinks()); 
+        assertTrue(departmentFour.toString().contains("</api/department/4>;rel=\"self\""));
+        assertEquals("Some Sector 4", departmentFour.getSector());
+        assertNotNull(departmentFour.getProducts());
+        
         
 
     }
 
-
-
-	  /*
-	 * @Test void testFindDepartmentsWithoutProducts() {
-	 * fail("Not yet implemented"); }
-	 * 
-	 * 
-	 */
+	  @Test void testFindDepartmentsWithoutProducts() {
+		  
+	  }
+	
 
 }
