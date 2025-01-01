@@ -70,9 +70,8 @@ public class DepartmentService {
         var department = departmentRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Department", "id", id));
         
-        var dto = departmentMapper.toDTO(department);
+        var dto = departmentMapper.parseObject(department, DepartmentDTO.class);
         dto.add(linkTo(methodOn(DepartmentController.class).findById(id)).withSelfRel());
-        
         return dto;
     }
 

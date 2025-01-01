@@ -66,7 +66,7 @@ class DepartmentServiceTest {
         departmentDTO.setKey(1L);
 
         when(repository.findById(1L)).thenReturn(Optional.of(department));
-        when(departmentMapper.toDTO(department)).thenReturn(departmentDTO);
+        when(departmentMapper.parseObject(department, DepartmentDTO.class)).thenReturn(departmentDTO);
 
         var result = service.findById(1L);
 

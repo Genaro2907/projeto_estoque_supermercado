@@ -1,5 +1,7 @@
 package gabrieldev.com.supermercado_estoque.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import gabrieldev.com.supermercado_estoque.model.DTO.ProductDTO;
+import gabrieldev.com.supermercado_estoque.model.DTO.SimpleProductDTO;
 import gabrieldev.com.supermercado_estoque.services.ProductService;
 import gabrieldev.com.supermercado_estoque.util.MediaType;
 
@@ -35,8 +38,8 @@ public class ProductController {
 
     @GetMapping(produces = {
     		MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML})
-    public ResponseEntity<CollectionModel<EntityModel<ProductDTO>>> findAll() {
-        CollectionModel<EntityModel<ProductDTO>> products = productService.findAll();
+    public ResponseEntity<List<SimpleProductDTO>> findAll() {
+        List<SimpleProductDTO> products = productService.findAll();
         return ResponseEntity.ok(products);
     }
 

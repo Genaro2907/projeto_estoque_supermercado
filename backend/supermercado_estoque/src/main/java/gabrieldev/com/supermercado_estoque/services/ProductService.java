@@ -20,6 +20,7 @@ import gabrieldev.com.supermercado_estoque.controllers.exceptions.ResourceNotFou
 import gabrieldev.com.supermercado_estoque.model.Department;
 import gabrieldev.com.supermercado_estoque.model.Product;
 import gabrieldev.com.supermercado_estoque.model.DTO.ProductDTO;
+import gabrieldev.com.supermercado_estoque.model.DTO.SimpleProductDTO;
 import gabrieldev.com.supermercado_estoque.repository.DepartmentRepository;
 import gabrieldev.com.supermercado_estoque.repository.ProductRepository;
 import gabrieldev.com.supermercado_estoque.services.mapper.ProductMapper;
@@ -33,28 +34,22 @@ public class ProductService {
     @Autowired
     private  DepartmentRepository departmentRepository;
     @Autowired
-    private ProductMapper productMapper;
-    @Autowired
     private ProductValidator validator;
 
 
-    public CollectionModel<EntityModel<ProductDTO>> findAll() {
+    public List<SimpleProductDTO> findAll() {
         logger.info("Finding all products");
         try {
-            List<EntityModel<ProductDTO>> products = productRepository.findAll().stream()
-                .map(product -> {
-                    ProductDTO dto = productMapper.convertToDTO(product);
-                    return EntityModel.of(dto,
-                        linkTo(methodOn(ProductController.class).findById(dto.getKey())).withSelfRel());
-                })
-                .collect(Collectors.toList());
-
+            var products = ProductMapper.parseListObjects(productRepository.findAll(), SimpleProductDTO.class);
+            		
             if (products.isEmpty()) {
                 logger.warn("No products found");
             }
-
-            return CollectionModel.of(products,
-                linkTo(methodOn(ProductController.class).findAll()).withSelfRel());
+            products
+            .stream()
+            .forEach(p -> p.add(linkTo(methodOn(ProductController.class).findById(p.getKey())).withSelfRel()));
+  
+            return products;
         } catch (Exception e) {
             logger.error("Error while finding all products", e);
             throw new BusinessException("Error while retrieving products: " + e.getMessage());
@@ -66,10 +61,9 @@ public class ProductService {
         validator.validateId(id);
 
         try {
-            var dto = productRepository.findById(id)
-                .map(productMapper::convertToDTO)
+            var entity = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
-
+            var dto = ProductMapper.parseObject(entity, ProductDTO.class);
             dto.add(linkTo(methodOn(ProductController.class).findById(id)).withSelfRel());
             return dto;
         } catch (ResourceNotFoundException e) {
@@ -97,7 +91,7 @@ public class ProductService {
             product.setDepartment(department);
 
             Product savedProduct = productRepository.save(product);
-            var dto = productMapper.convertToDTO(savedProduct);
+            var dto = ProductMapper.parseObject(savedProduct, ProductDTO.class);
             dto.add(linkTo(methodOn(ProductController.class).findById(dto.getKey())).withSelfRel());
             return dto;
         } catch (ResourceNotFoundException e) {
@@ -127,7 +121,7 @@ public class ProductService {
             existingProduct.setDepartment(department);
 
             Product updatedProduct = productRepository.save(existingProduct);
-            var dto = productMapper.convertToDTO(updatedProduct);
+            var dto = ProductMapper.parseObject(updatedProduct,  ProductDTO.class);
             dto.add(linkTo(methodOn(ProductController.class).findById(dto.getKey())).withSelfRel());
             return dto;
         } catch (ResourceNotFoundException e) {
@@ -161,14 +155,14 @@ public class ProductService {
         validator.validateId(departmentId);
 
         try {
-            // Verificar se o departamento existe
+            
             if (!departmentRepository.existsById(departmentId)) {
                 throw new ResourceNotFoundException("Department", "id", departmentId);
             }
 
             List<EntityModel<ProductDTO>> products = productRepository.findByDepartmentId(departmentId).stream()
                 .map(product -> {
-                    ProductDTO dto = productMapper.convertToDTO(product);
+                    ProductDTO dto = ProductMapper.parseObject(product, ProductDTO.class);
                     return EntityModel.of(dto,
                         linkTo(methodOn(ProductController.class).findById(dto.getKey())).withSelfRel());
                 })

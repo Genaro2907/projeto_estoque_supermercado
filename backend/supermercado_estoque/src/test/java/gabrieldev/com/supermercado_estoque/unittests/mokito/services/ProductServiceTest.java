@@ -64,7 +64,7 @@ class ProductServiceTest {
         productDTO.setKey(1L);
 
         when(repository.findById(1L)).thenReturn(Optional.of(product));
-        when(productMapper.convertToDTO(product)).thenReturn(productDTO);
+        //when(productMapper.convertToDTO(product)).thenReturn(productDTO);
         
         var result = service.findById(1L);
 

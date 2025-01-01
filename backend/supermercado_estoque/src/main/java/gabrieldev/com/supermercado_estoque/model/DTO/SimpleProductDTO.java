@@ -4,12 +4,14 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
+import org.springframework.hateoas.RepresentationModel;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.github.dozermapper.core.Mapping;
 
 @JsonPropertyOrder({ "id", "name", "description", "quantity", "entryDate", "departmentID"})
-public class SimpleProductDTO implements Serializable{
+public class SimpleProductDTO  extends RepresentationModel<SimpleProductDTO> implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@JsonProperty("id")
@@ -19,20 +21,25 @@ public class SimpleProductDTO implements Serializable{
 	private String description;
 	private Integer quantity;
 	private Date entryDate;
+	private SimpleDepartmentDTO departmentID;
 	
 	
 	public SimpleProductDTO() {
 		
 	}
 
-	public SimpleProductDTO(Long key, String name, String description, Integer quantity, Date entryDate) {
+	public SimpleProductDTO(Long key, String name, String description, Integer quantity, Date entryDate,
+			SimpleDepartmentDTO departmentID) {
 		super();
 		this.key = key;
 		this.name = name;
 		this.description = description;
 		this.quantity = quantity;
 		this.entryDate = entryDate;
+		this.departmentID = departmentID;
 	}
+
+
 
 	public Long getKey() {
 		return key;
@@ -80,10 +87,18 @@ public class SimpleProductDTO implements Serializable{
 	public void setEntryDate(Date entryDate) {
 		this.entryDate = entryDate;
 	}
+	
+	public SimpleDepartmentDTO getDepartmentID() {
+		return departmentID;
+	}
+
+	public void setDepartmentID(SimpleDepartmentDTO departmentID) {
+		this.departmentID = departmentID;
+	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(description, entryDate, key, name, quantity);
+		return Objects.hash(departmentID, description, entryDate, key, name, quantity);
 	}
 
 	@Override
@@ -95,9 +110,12 @@ public class SimpleProductDTO implements Serializable{
 		if (getClass() != obj.getClass())
 			return false;
 		SimpleProductDTO other = (SimpleProductDTO) obj;
-		return Objects.equals(description, other.description) && Objects.equals(entryDate, other.entryDate)
-				&& Objects.equals(key, other.key) && Objects.equals(name, other.name)
-				&& Objects.equals(quantity, other.quantity);
+		return Objects.equals(departmentID, other.departmentID) && Objects.equals(description, other.description)
+				&& Objects.equals(entryDate, other.entryDate) && Objects.equals(key, other.key)
+				&& Objects.equals(name, other.name) && Objects.equals(quantity, other.quantity);
 	}
 
+	
+
+	
 }
