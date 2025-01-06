@@ -85,15 +85,16 @@ public class ProductService {
             Department department = departmentRepository.findById(productDTO.getDepartmentID().getKey())
                 .orElseThrow(() -> new ResourceNotFoundException("Department", "id", productDTO.getDepartmentID().getKey()));
 
-            Product product = new Product();
-            product.setName(productDTO.getName());
-            product.setDescription(productDTO.getDescription());
-            product.setQuantity(productDTO.getQuantity());
-            product.setEntryDate(productDTO.getEntryDate());
+            Product product = productMapper.toEntity(productDTO);
             product.setDepartment(department);
 
             Product savedProduct = productRepository.save(product);
-            var dto = productMapper.parseObject(savedProduct, ProductDTO.class);
+            ProductDTO dto = productMapper.toDTO(savedProduct);
+
+            if (dto == null) {
+                throw new BusinessException("Error in mapping Product to ProductDTO: Mapping resulted in null");
+            }
+
             dto.add(linkTo(methodOn(ProductController.class).findById(dto.getKey())).withSelfRel());
             return dto;
         } catch (ResourceNotFoundException e) {
@@ -103,6 +104,7 @@ public class ProductService {
             throw new BusinessException("Error while creating product: " + e.getMessage());
         }
     }
+
 
     @Transactional
     public ProductDTO update(Long id, ProductDTO productDTO) {
@@ -123,7 +125,12 @@ public class ProductService {
             existingProduct.setDepartment(department);
 
             Product updatedProduct = productRepository.save(existingProduct);
-            var dto = productMapper.parseObject(updatedProduct,  ProductDTO.class);
+            ProductDTO dto = productMapper.toDTO(updatedProduct);
+
+            if (dto == null) {
+                throw new BusinessException("Error in mapping Product to ProductDTO: Mapping resulted in null");
+            }
+
             dto.add(linkTo(methodOn(ProductController.class).findById(dto.getKey())).withSelfRel());
             return dto;
         } catch (ResourceNotFoundException e) {
@@ -133,6 +140,7 @@ public class ProductService {
             throw new BusinessException("Error while updating product: " + e.getMessage());
         }
     }
+
 
     @Transactional
     public void delete(Long id) {

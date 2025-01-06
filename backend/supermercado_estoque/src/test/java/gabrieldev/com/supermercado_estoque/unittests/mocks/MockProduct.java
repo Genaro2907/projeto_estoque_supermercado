@@ -10,7 +10,6 @@ import gabrieldev.com.supermercado_estoque.model.DTO.ProductDTO;
 
 public class MockProduct {
 
-	 //private final MockDepartment mockDepartment = new MockDepartment();
 	
     public Product mockEntity() {
         return mockEntity(0);
@@ -56,8 +55,6 @@ public class MockProduct {
     public ProductDTO mockDTO(Integer number) {
         ProductDTO productDTO = new ProductDTO();
         DepartmentDTO departmentDTO = new DepartmentDTO();
-        
-       
         
         departmentDTO.setKey(number.longValue());
         departmentDTO.setSector("Sector Test" + number);
