@@ -19,7 +19,7 @@ public class ProductMapper {
 	
 private static  Mapper mapper = DozerBeanMapperBuilder.buildDefault();
 	
-public static <O, D> D parseObject(O origin, Class<D> destination) {
+public <O, D> D parseObject(O origin, Class<D> destination) {
     D destinationObject = mapper.map(origin, destination);
 
     if (origin instanceof ProductDTO && destinationObject instanceof Product) {
@@ -76,6 +76,8 @@ public static <O, D> List<D> parseListObjects(List<O> origin, Class<D> destinati
     }
 
     return destinationObjects;
+    
+    
 }
 
 }

@@ -35,6 +35,8 @@ public class ProductService {
     private  DepartmentRepository departmentRepository;
     @Autowired
     private ProductValidator validator;
+    @Autowired
+    private ProductMapper productMapper;
 
 
     public List<SimpleProductDTO> findAll() {
@@ -63,7 +65,7 @@ public class ProductService {
         try {
             var entity = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
-            var dto = ProductMapper.parseObject(entity, ProductDTO.class);
+            var dto = productMapper.parseObject(entity, ProductDTO.class);
             dto.add(linkTo(methodOn(ProductController.class).findById(id)).withSelfRel());
             return dto;
         } catch (ResourceNotFoundException e) {
@@ -91,7 +93,7 @@ public class ProductService {
             product.setDepartment(department);
 
             Product savedProduct = productRepository.save(product);
-            var dto = ProductMapper.parseObject(savedProduct, ProductDTO.class);
+            var dto = productMapper.parseObject(savedProduct, ProductDTO.class);
             dto.add(linkTo(methodOn(ProductController.class).findById(dto.getKey())).withSelfRel());
             return dto;
         } catch (ResourceNotFoundException e) {
@@ -121,7 +123,7 @@ public class ProductService {
             existingProduct.setDepartment(department);
 
             Product updatedProduct = productRepository.save(existingProduct);
-            var dto = ProductMapper.parseObject(updatedProduct,  ProductDTO.class);
+            var dto = productMapper.parseObject(updatedProduct,  ProductDTO.class);
             dto.add(linkTo(methodOn(ProductController.class).findById(dto.getKey())).withSelfRel());
             return dto;
         } catch (ResourceNotFoundException e) {
@@ -162,7 +164,7 @@ public class ProductService {
 
             List<EntityModel<ProductDTO>> products = productRepository.findByDepartmentId(departmentId).stream()
                 .map(product -> {
-                    ProductDTO dto = ProductMapper.parseObject(product, ProductDTO.class);
+                    ProductDTO dto = productMapper.parseObject(product, ProductDTO.class);
                     return EntityModel.of(dto,
                         linkTo(methodOn(ProductController.class).findById(dto.getKey())).withSelfRel());
                 })

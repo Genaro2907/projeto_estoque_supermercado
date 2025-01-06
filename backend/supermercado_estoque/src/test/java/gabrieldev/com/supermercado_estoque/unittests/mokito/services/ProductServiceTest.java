@@ -3,7 +3,6 @@ package gabrieldev.com.supermercado_estoque.unittests.mokito.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -30,6 +29,7 @@ class ProductServiceTest {
 	@InjectMocks
 	private ProductService service;
 
+	
 	@Mock
 	private ProductMapper productMapper;
 	
@@ -49,12 +49,8 @@ class ProductServiceTest {
 		input = new MockProduct();
         MockitoAnnotations.openMocks(this);
 	}
-
-	@Test
-	void testFindAll() {
-		fail("Not yet implemented");
-	}
-
+	
+	
 	@Test
 	void testFindById() {
 		Product product = input.mockEntity(1);
@@ -64,7 +60,7 @@ class ProductServiceTest {
         productDTO.setKey(1L);
 
         when(repository.findById(1L)).thenReturn(Optional.of(product));
-        //when(productMapper.convertToDTO(product)).thenReturn(productDTO);
+        when(productMapper.parseObject(product, ProductDTO.class)).thenReturn(productDTO);
         
         var result = service.findById(1L);
 
@@ -79,7 +75,12 @@ class ProductServiceTest {
         assertTrue(result.toString().contains("links: [</api/product/1>;rel=\"self\"]"),
                 "Self-link should be present");
 	}
-
+	
+	/*
+	@Test
+	void testFindAll() {
+		fail("Not yet implemented");
+	}
 	@Test
 	void testCreate() {
 		fail("Not yet implemented");
@@ -99,5 +100,5 @@ class ProductServiceTest {
 	void testFindByDepartment() {
 		fail("Not yet implemented");
 	}
-
+	*/
 }

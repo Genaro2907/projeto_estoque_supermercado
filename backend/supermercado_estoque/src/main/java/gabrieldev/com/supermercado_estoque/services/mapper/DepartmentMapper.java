@@ -28,7 +28,7 @@ public class DepartmentMapper {
 		return destinationObjects;
 	}
 	
-	public  <O, D> D parseObject(O origin, Class<D> destination) {
+	public <O, D> D parseObject(O origin, Class<D> destination) {
 		return mapper.map(origin, destination);
 	}
 	
