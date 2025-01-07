@@ -79,6 +79,7 @@ public class ProductService {
     @Transactional
     public ProductDTO create(ProductDTO productDTO) {
         logger.info("Creating new product");
+        if(productDTO == null) throw new BusinessException("It is not allowed to persist a null object!");
         validator.validateProductDTO(productDTO);
 
         try {
@@ -109,6 +110,9 @@ public class ProductService {
     @Transactional
     public ProductDTO update(Long id, ProductDTO productDTO) {
         logger.info("Updating product with id: {}", id);
+        if (id == null) {
+            throw new BusinessException("Product ID cannot be null");
+        }
         validator.validateUpdate(productDTO, id);
 
         try {
